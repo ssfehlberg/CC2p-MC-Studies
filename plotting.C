@@ -12,22 +12,30 @@
 //PNG images of the plots are saved to specified pathname
 ///////////////////////
 #include "plotting.h"
+#include "tools/constants.h"
+using namespace Constants;
 
 void plotting::main(){
 
+  //Pull the constants from constants. Determines which file we open
+  const char* FSI;
+  const char* XSEC_BINNING;
+
+  if(fsi == true){FSI = "fsi";} else { FSI = "no_fsi";};
+  if(use_xsec_binning == true){ XSEC_BINNING = "xsec";} else { XSEC_BINNING = "no_xsec";};
+
   //Load in the histogram file
   std::vector<TFile*> files; //vector of all the files
-  TFile* f1=new TFile("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/fsi/hists_empirical_lwellyn_fsi.root");
-  TFile* f2=new TFile("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/fsi/hists_nieves_fsi.root");
-  TFile* f3=new TFile("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/fsi/hists_susav2_fsi.root");
-  //TFile* f4=new TFile("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/fsi/hists_GCF_CCQE_fsi.root"); //don't know how to compare to this yet. 
-
+  TFile* f1 = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/%s/hists_empirical_lwellyn_%s_%s.root",FSI,FSI,XSEC_BINNING));
+  TFile* f2 = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/%s/hists_nieves_%s_%s.root",FSI,FSI,XSEC_BINNING));
+  TFile* f3 = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/%s/hists_susav2_%s_%s.root",FSI,FSI,XSEC_BINNING));
+  //TFile* f4=new TFile("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/%s/hists_GCF_CCQE_%s%s.root",FSI,FSI,XSEC_BINNING)); //don't know how to compare to this yet. 
   files.push_back(f1);
   files.push_back(f2);
   files.push_back(f3);
   //files.push_back(f4);
     
-  const char* pathname = Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/images/");
+  const char* pathname = Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/images/%s/%s",FSI,XSEC_BINNING);
   string path(pathname);
    
   //Grab the histograms

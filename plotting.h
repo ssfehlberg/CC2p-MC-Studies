@@ -288,7 +288,7 @@ void plotting::cross_section_plot(TH1D* h_empirical,TH1D* h_nieves,TH1D* h_susa,
 // equation: the equation we use for the prediction
 void plotting::truth_vs_pred_plot(TH1D* h_empirical_pred,TH1D* h_empirical_truth, TH1D* h_nieves_pred,TH1D* h_nieves_truth, TH1D* h_susa_pred, TH1D* h_susa_truth, const char* equation, double y_lim,const char* title, const char* path, const char* variable){
 
-  TCanvas* canv_truth = new TCanvas("canv_truth","canv_truth",4200,800);
+  TCanvas* canv_truth = new TCanvas("canv_truth","canv_truth",1700,800);
   canv_truth->Divide(2,1);
   canv_truth->cd(1);
 

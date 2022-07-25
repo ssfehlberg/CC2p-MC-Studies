@@ -28,16 +28,17 @@ void GENIE_selection::Loop(){
   
   //Open output root file and resulting table
   ///////////////////////////////////////
-  TFile* outputfile;
-  if(fsi == true){
-    outputfile = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/fsi/hists_%s_fsi.root",sample), "RECREATE");
-  }else{
-    outputfile = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/no_fsi/hists_%s_no_fsi.root",sample), "RECREATE");
-  }
+  const char* FSI;
+  const char* XSEC_BINNING;
+  if(fsi == true){ FSI = "fsi";} else { FSI = "no_fsi";};
+  if(use_xsec_binning == true){ XSEC_BINNING = "xsec";} else { XSEC_BINNING = "no_xsec";};
+
+  TFile* outputfile = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/%s/hists_%s_%s_%s.root",FSI,sample,FSI,XSEC_BINNING), "RECREATE");
+
   std::ofstream result_table; //csv file containing the number of events after each cut
   std::ofstream interaction_table; //csv file containing the breakdown of events in terms of interaction modes
-  result_table.open(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/tables/%s_remaining_events.csv",sample));
-  interaction_table.open(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/tables/%s_interaction_modes.csv",sample));
+  result_table.open(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/tables/%s_remaining_events_%s_%s.csv",sample,FSI,XSEC_BINNING));
+  interaction_table.open(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/tables/%s_interaction_modes_%s_%s.csv",sample,FSI,XSEC_BINNING));
 
   //Define all the Histograms
   ///////////////////////////

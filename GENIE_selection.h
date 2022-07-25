@@ -7,7 +7,6 @@
 #define GENIE_selection_h
 
 //Helpful class includes:
-#include "GENIE_selection.h"
 #include "tools/histogram_funcs.h"
 #include "tools/constants.h"
 using namespace Constants;

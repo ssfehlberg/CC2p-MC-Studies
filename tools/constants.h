@@ -9,7 +9,7 @@ namespace Constants{
   bool add_protons = true;
 
   //Are we using the xsecc binning
-  bool use_xsec_binning = false;
+  bool use_xsec_binning = true;
 
   //FOR GENIE ONLY
   //do we want with FSI or without FSI?

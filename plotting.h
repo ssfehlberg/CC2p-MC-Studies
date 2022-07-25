@@ -1,8 +1,7 @@
 /////////////////////
 //7/19/2022: plotting.h
 //Author: Samantha Sword-Fehlberg
-//Header file for plotting.C.
-//
+//Header file for plotting.C
 ////////////////////////////
 
 //Helpful includes
@@ -15,11 +14,14 @@ class plotting{
 
  public:
   virtual void main();
+  virtual void area_normalize(TH1D* hist);
   virtual void area_normalized_plot(TH1D* h_empirical, TH1D* h_nieves, TH1D* h_susa, double y_lim,const char* title, const char* path, const char* variable);
-  virtual void cross_section_plot(TH1D* h_empirical,TH1D* h_nieves,TH1D* h_susa,TH1D* h_GCF, double y_lim,const char* title, const char* path, const char* variable);
-  virtual void truth_pred_plot();
+  virtual void cross_section_plot(TH1D* h_empirical,TH1D* h_nieves,TH1D* h_susa, double y_lim,const char* title, const char* path, const char* variable);
+  virtual void truth_vs_pred_plot(TH1D* h_empirical_pred,TH1D* h_empirical_truth, TH1D* h_nieves_pred,TH1D* h_nieves_truth, TH1D* h_susa_pred, TH1D* h_susa_truth, const char* equation, double y_lim,const char* title, const char* path, const char* variable);
 
  private:
+
+  bool _debug = false;
 
   //Stuff for date and time
   //////////////////////////
@@ -31,9 +33,9 @@ class plotting{
 
   //Generally stuff for all the plots
   //////////////////////////////////
-  gStyle->SetPaintTextFormat("4.2f");
-  gStyle->SetHistMinimumZero(kTRUE);
-  gStyle->SetOptStat(0);
+  //gStyle->SetPaintTextFormat("4.2f");
+  //gStyle->SetHistMinimumZero(kTRUE);
+  //gStyle->SetOptStat(0);
   const char* in_prog= "#scale[0.6]{MicroBooNE In-Progress}";
   const char* prelim= "#scale[0.6]{MicroBooNE Preliminary}";
 
@@ -53,12 +55,15 @@ class plotting{
   TH1D* h_muon[num_mc][num_cuts][num_var];
   TH1D* h_leading[num_mc][num_cuts][num_var];
   TH1D* h_recoil[num_mc][num_cuts][num_var];
-  double muon_ylim[num_var] = {0.09,0.12,0.6,0.05}; //y limit for area normalization plot       
-  double muon_ylim_xsec[num_var] = {0.09,0.12,0.6,0.05}; //y limit for xsec plot     
-  double leading_ylim[num_var] = {0.1,0.3,0.6,0.05}; //y limit for area normalization plot
-  double leading_ylim_xsec[num_var] = {0.09,0.12,0.6,0.05}; //y limit for xsec plot
-  double recoil_ylim[num_var] = {0.25,0.5,0.3,0.05}; //y limit for area normalization plot 
-  double recoil_ylim_xsec[num_var] = {0.09,0.12,0.6,0.05}; //y limit for xsec plot
+  //double muon_ylim[num_var] = {0.09,0.12,0.6,0.05}; //y limit for area normalization plot       
+  double muon_ylim[num_var] = {0.5,0.12,0.7,0.15}; //y limit for area normalization plot 
+  double muon_ylim_xsec[num_var] = {17,0.12,18,2}; //y limit for xsec plot     
+
+  double leading_ylim[num_var] = {0.5,0.3,0.7,0.15}; //y limit for area normalization plot
+  double leading_ylim_xsec[num_var] = {25,16,16,2}; //y limit for xsec plot
+
+  double recoil_ylim[num_var] = {0.8,0.5,0.5,0.15}; //y limit for area normalization plot 
+  double recoil_ylim_xsec[num_var] = {50,0.12,8,2}; //y limit for xsec plot
 
   //crap ton of physics plots
   /////////////////////////////
@@ -72,6 +77,8 @@ class plotting{
 					       "#deltaP_{T} (GeV/c)","#delta#alpha_{T} (Deg.)","#delta#phi_{T} (Deg.)","p_{n} (GeV/c)",
 					       "Total Muon Energy + Total Kinetic Energy of Protons (GeV/c)","Total Energy Minus Beam Energy (MeV/c)","(P^{T}_{miss})^{2} (GeV^{2}/c^{2})","Energy of the Neutrino (GeV/c)"};//,"E^{True}_{#nu} - E^{Calculated}_{#nu} (GeV/c)"};
   TH1D* h_physics[num_mc][num_cuts][num_variables];
+  TH1D* h_true_nu_e[num_mc];
+  TH1D* h_true_pn[num_mc];
   double y_lim_physics[num_cuts][num_variables] = {{1,1,1,1,1,1,1,1,1,1,1,1},
 						   {1,1,1,1,1,1,1,1,1,1,1,1},
 						   {1,1,1,1,1,1,1,1,1,1,1,1},
@@ -82,9 +89,25 @@ class plotting{
 							{1,1,1,1,1,1,1,1,1,1,1,1},
 							{1,1,1,1,1,1,1,1,1,1,1,1},
 							{1,1,1,1,1,1,1,1,1,1,1,1},
-							{0.2,0.12,0.17,0.13,0.1,0.4,1,0.1,0.1,0.1,0.1,0.1}}; //y limit for xsec plot
+							{8,8,8,8,20,0.08,0.16,35,0.1,0.1,0.1,15}}; //y limit for xsec plot
 
 }; //end of class definition
+
+// [area_normalize]
+// Needed to area normalize the plots before plotting them on the same graph
+// 
+void plotting::area_normalize(TH1D* hist){
+
+  int n_bins = hist->GetNbinsX();
+  double n_events = hist->Integral();
+
+  for(int j=1; j < n_bins + 1; j++){
+    double bin_content = hist->GetBinContent(j);
+    double value = bin_content/n_events;
+    hist->SetBinContent(j, value);
+  }
+  
+} //end of area_normalize
 
 //[area_normalized_plot]
 // Plots histograms from the 4 samples. Samples have already be area normalized by GENIE_selection.C
@@ -101,6 +124,7 @@ void plotting::area_normalized_plot(TH1D* h_empirical, TH1D* h_nieves, TH1D* h_s
   canv_area->SetLeftMargin(0.15);
   canv_area->SetBottomMargin(0.15);
   
+  area_normalize(h_empirical);
   h_empirical->Draw("hist"); //empiricial + lwellyn smith
   h_empirical->SetLineColor(kGreen+2);
   h_empirical->SetLineWidth(4);
@@ -112,14 +136,17 @@ void plotting::area_normalized_plot(TH1D* h_empirical, TH1D* h_nieves, TH1D* h_s
   h_empirical->GetYaxis()->SetTitleSize(0.035);
   h_empirical->SetMaximum(y_lim); //0.015//10000,//1900
 
+  area_normalize(h_nieves);
   h_nieves->Draw("histSAME"); //nieves
   h_nieves->SetLineColor(kBlue);
   h_nieves->SetLineWidth(4);
 
+  area_normalize(h_susa);
   h_susa->Draw("histSAME"); //susav2
   h_susa->SetLineColor(kRed);
   h_susa->SetLineWidth(4);
 
+  //area_normalize(h_GCF);
   //h_GCF->Draw("histSAME"); //gcf
   //h_GCF->SetLineColor(kYellow+3);
   //h_GCF->SetLineWidth(4);
@@ -148,9 +175,9 @@ void plotting::area_normalized_plot(TH1D* h_empirical, TH1D* h_nieves, TH1D* h_s
 //Allows for a direct comparison of the different generators on the CC1mu2p cross-section
 //INPUTS:
 //
-void plotting::cross_section_plot(TH1D* h_empirical,TH1D* h_nieves,TH1D* h_susa,TH1D* h_GCF, double y_lim,const char* title, const char* path, const char* variable){
+void plotting::cross_section_plot(TH1D* h_empirical,TH1D* h_nieves,TH1D* h_susa, double y_lim,const char* title, const char* path, const char* variable){
 
-  //here are the sigmas. Taken from the GENIE splines                                                                                                                                                                                                                                                  
+  //here are the sigmas. Taken from the GENIE splines                                                                                                                                                                                                                           
   double sigma_empirical = 3.02249 * 1E-37;
   double sigma_nieves = 27.1682 * 1E-38;
   double sigma_susa = 38.1417 * 1E-38;
@@ -161,48 +188,49 @@ void plotting::cross_section_plot(TH1D* h_empirical,TH1D* h_nieves,TH1D* h_susa,
   double N_susa = 3800000;
   //double N_GCF = 500000;
 
-  //Here is were we calculate the dsigma/dx and the SD of dsigma/dx                                                                                                                                                                                                                                    
+  //Here is were we calculate the dsigma/dx and the SD of dsigma/dx                                                                                                                                                                                                           
+  /////////////////////////////////////////////////////////////////
   double n_bins = h_empirical->GetNbinsX();
 
   for(int i=1; i < n_bins+1; i++){
     double delta_x = h_empirical->GetBinWidth(i);
 
-    //empirical                                                                                                                                                                                                                                                                                        
-    double n_empirical = h_empirical->GetBinContent(i) * N_empirical;
+    //empirical                                                                                                                                                                                                                                                                 
+    double n_empirical = h_empirical->GetBinContent(i);
     double value_empirical = (sigma_empirical * n_empirical)/( N_empirical * delta_x);
     double SD_empirical = (sigma_empirical)/(delta_x*N_empirical) * std::sqrt(((N_empirical - n_empirical)*n_empirical)/(N_empirical));
     h_empirical->SetBinContent(i,value_empirical);
     h_empirical->SetBinError(i,SD_empirical);
-    std::cout<<"EMPIRICAL value: "<<value_empirical<<std::endl;
+    if(_debug) std::cout<<"EMPIRICAL value: "<<value_empirical<<std::endl;
 
-    //nieves                                                                                                                                                                                                                                                                                          
+    //nieves                                                                                                                                                                                                                                                                    
     double n_nieves = h_nieves->GetBinContent(i);
     double value_nieves = (sigma_nieves * n_nieves)/(N_nieves * delta_x);
     double SD_nieves = (sigma_nieves)/(delta_x*N_nieves) * std::sqrt(((N_nieves - n_nieves)*n_nieves)/(N_nieves));
     h_nieves->SetBinContent(i,value_nieves);
     h_nieves->SetBinError(i,SD_nieves);
-    std::cout<<"NIEVES value: "<<value_nieves<<std::endl;
+    if(_debug) std::cout<<"NIEVES value: "<<value_nieves<<std::endl;
 
-    //susa                                                                                                                                                                                                                                                                                             
+    //susa                                                                                                                                                                                                                                                                      
     double n_susa = h_susa->GetBinContent(i);
     double value_susa = (sigma_susa * n_susa)/(N_susa * delta_x);
     double SD_susa = (sigma_susa)/(delta_x*N_susa) * std::sqrt(((N_susa - n_susa)*n_susa)/(N_susa));
     h_susa->SetBinContent(i,value_susa);
     h_susa->SetBinError(i,SD_susa);
-    std::cout<<"SUSA value: "<<value_susa<<std::endl;
+    if(_debug) std::cout<<"SUSA value: "<<value_susa<<std::endl;
 
-    /*//Dealing with the GCF is a bit trickier                                                                                                                                                                                                                                                              //Each event in the GCF is assigned a weight which modifies the CCQE differential cross section                                                                                                                                                                                                    
+    /*//Dealing with the GCF is a bit trickier                                                                                                                                                                                                              
+    //Each event in the GCF is assigned a weight which modifies the CCQE differential cross section                                                                                                                                                    
     double n_GCF = h_GCF->GetBinContent(i);
     double value_GCF = (n_GCF)/(N_GCF*delta_x);
     double SD_GCF = (1)/(delta_x*N_GCF) * std::sqrt(((N_GCF - n_GCF)*n_GCF)/(N_GCF));
     h_GCF->SetBinContent(i,value_GCF);
     h_GCF->SetBinError(i,SD_GCF);
-    std::cout<<"GCF value: "<<value_GCF<<std::endl;*/
+    if(_debug) std::cout<<"GCF value: "<<value_GCF<<std::endl;*/
 
   } //end of for loop 
 
   TCanvas* canv_xsec = new TCanvas("canv_xsec","canv_xsec",2000,1500);
-  //canv_xsec->cd();
   canv_xsec->SetRightMargin(0.09);
   canv_xsec->SetLeftMargin(0.15);
   canv_xsec->SetBottomMargin(0.15);
@@ -216,6 +244,7 @@ void plotting::cross_section_plot(TH1D* h_empirical,TH1D* h_nieves,TH1D* h_susa,
   h_empirical->GetXaxis()->SetTitleSize(0.035);
   h_empirical->GetYaxis()->SetTitleSize(0.035);
   h_empirical->SetMaximum(y_lim); //0.015//10000,//1900
+  h_empirical->SetMinimum(0);
   h_empirical->SetTitle(Form("%s %s","",title)); //titles_cuts[i]
 
   h_nieves->Scale(1/1E-38);
@@ -251,7 +280,110 @@ void plotting::cross_section_plot(TH1D* h_empirical,TH1D* h_nieves,TH1D* h_susa,
 
 }//end of cross section plot
 
-void plotting::truth_pred_plot(){
+// [truth_vs_pred_plot] 
+// Takes the GENIE prediction (h_truth), and compares it to the prediction (h_pred) of that variable from our equations
+// Title: title of the plot
+// path: where to save the png and pdf
+// variable: variable we are plotting
+// equation: the equation we use for the prediction
+void plotting::truth_vs_pred_plot(TH1D* h_empirical_pred,TH1D* h_empirical_truth, TH1D* h_nieves_pred,TH1D* h_nieves_truth, TH1D* h_susa_pred, TH1D* h_susa_truth, const char* equation, double y_lim,const char* title, const char* path, const char* variable){
+
+  TCanvas* canv_truth = new TCanvas("canv_truth","canv_truth",4200,800);
+  canv_truth->Divide(2,1);
+  canv_truth->cd(1);
+
+  h_empirical_pred->Draw("hist");
+  h_empirical_pred->SetLineColor(kGreen+2);
+  h_empirical_pred->SetLineWidth(4);
+  h_empirical_pred->SetLineStyle(9);
+  h_empirical_pred->GetXaxis()->SetTitle(Form("%s",title));
+  h_empirical_pred->GetYaxis()->SetTitle("Fractional Number of Events (%)");
+  h_empirical_pred->GetXaxis()->SetTitleSize(0.035);
+  h_empirical_pred->GetYaxis()->SetTitleSize(0.035);
+  h_empirical_pred->SetMaximum(1); //0.015//10000,//1900                                                                                                                                                      
+  h_empirical_pred->SetMinimum(0);
+  h_empirical_pred->SetTitle(Form("%s %s","",title)); //titles_cuts[i]
+
+  area_normalize(h_empirical_truth);
+  h_empirical_truth->Draw("histSAME"); //empirical
+  h_empirical_truth->SetLineColor(kGreen+2);
+  h_empirical_truth->SetLineWidth(4);
+
+  h_nieves_pred->Draw("histSAME"); //nieves 
+  h_nieves_pred->SetLineColor(kBlue);
+  h_nieves_pred->SetLineWidth(4);
+  h_nieves_pred->SetLineStyle(9);
+
+  area_normalize(h_nieves_truth);
+  h_nieves_truth->Draw("histSAME"); //nieves                                                                                                                                                                                                                
+  h_nieves_truth->SetLineColor(kBlue);
+  h_nieves_truth->SetLineWidth(4);
+
+  h_susa_pred->Draw("histSAME"); //susav2                                                                                                                                                                                                                  
+  h_susa_pred->SetLineColor(kRed);
+  h_susa_pred->SetLineWidth(4);
+  h_susa_pred->SetLineStyle(9);
+
+  area_normalize(h_susa_truth);
+  h_susa_truth->Draw("histSAME"); //susav2                                                                                                                                                                                                                  
+  h_susa_truth->SetLineColor(kRed);
+  h_susa_truth->SetLineWidth(4);
+
+  TLegend* legend_truth = new TLegend(0.5,0.5,0.8,0.83,"");
+  legend_truth->SetHeader(Form("Prediction: %s",equation),"C");
+  legend_truth->AddEntry(h_empirical_truth,"GENIE Empirical Truth","l");
+  legend_truth->AddEntry(h_empirical_pred,"Empirical Prediction","l");
+  legend_truth->AddEntry(h_nieves_truth,"GENIE Nieves Truth","l");
+  legend_truth->AddEntry(h_nieves_pred,"Nieves Prediction","l");
+  legend_truth->AddEntry(h_susa_truth,"GENIE SuSAv2 Truth","l");
+  legend_truth->AddEntry(h_susa_pred,"SuSAv2 Prediction","l");
+  legend_truth->SetBorderSize(0);
+  legend_truth->SetTextSize(0.03);
+  legend_truth->SetFillColor(0);
+  legend_truth->Draw("same");
+
+  canv_truth->cd(2);
+  TH1D* h_empirical_res = (TH1D*)h_empirical_pred->Clone();
+  h_empirical_res->Add(h_empirical_res,h_empirical_truth,-1);
+  h_empirical_res->Divide(h_empirical_truth);
+  h_empirical_res->Draw("hist");
+  h_empirical_res->SetLineColor(kGreen+3);
+  h_empirical_res->SetLineWidth(4);
+  h_empirical_res->GetXaxis()->SetTitle(Form("%s",title));
+  h_empirical_res->GetYaxis()->SetTitle("(Pred. - Truth)/Truth");
+  h_empirical_res->GetXaxis()->SetTitleSize(0.035);
+  h_empirical_res->GetYaxis()->SetTitleSize(0.035);
+  h_empirical_res->SetMaximum(1);
+  h_empirical_res->SetMinimum(0);
+
+  TH1D* h_nieves_res = (TH1D*)h_nieves_pred->Clone();
+  h_nieves_res->Add(h_nieves_res,h_nieves_truth,-1);
+  h_nieves_res->Divide(h_nieves_truth);
+  h_nieves_res->Draw("histSAME");
+  h_nieves_res->SetLineColor(kBlue);
+  h_nieves_res->SetLineWidth(4);
+
+  TH1D* h_susa_res = (TH1D*)h_susa_pred->Clone();
+  h_susa_res->Add(h_susa_res,h_susa_truth,-1);
+  h_susa_res->Divide(h_susa_truth);
+  h_susa_res->Draw("histSAME");
+  h_susa_res->SetLineColor(kRed);
+  h_susa_res->SetLineWidth(4);
+
+  TLegend* legend_res = new TLegend(0.5,0.5,0.8,0.83,"");
+  legend_res->AddEntry(h_empirical_res,"GENIE Empirical Residual","l");
+  legend_res->AddEntry(h_nieves_res,"GENIE Nieves Residual","l");
+  legend_res->AddEntry(h_susa_res,"GENIE SuSAv2 Residual","l");
+  legend_res->SetBorderSize(0);
+  legend_res->SetTextSize(0.03);
+  legend_res->SetFillColor(0);
+  legend_res->Draw("same");
+
+  canv_truth->cd();
+  canv_truth->SetTitle(Form("%s",title));
+  canv_truth->Print(Form("%s%s_true_v_pred.png",path,variable));
+  canv_truth->Print(Form("%s%s_true_v_pred.pdf",path,variable));
+
 }//end of truth prediction plot
 
 //Used to make the pmiss_plot() from Raquel's old technote. No longer needed

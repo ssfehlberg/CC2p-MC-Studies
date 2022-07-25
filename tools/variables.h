@@ -1,5 +1,6 @@
 #include "helper_funcs.h"
 using namespace Constants;
+
 class variables{
 
  public:
@@ -300,7 +301,7 @@ double variables::Calculate_Beam(TVector3 vMuon, TVector3 vLead, TVector3 vRec,d
     // E_nu = Total Energy Muon + kinetic Energy Proton + Kinetic Energy Proton + (P^{T}_{Miss})/2*M_{A-2} + E_{Miss}
     //P^{T}_{Miss}  = p_mu^T + p_{Lead}^T + p_{recoil}^T i.e. transverse components of all the vectors
     // E_{miss} is estimated to be 30.4 MeV. M_{A-2} is taken to be 35.37 GeV. 
-    calculated_nu_E = (EMuon+MASS_MUON) + ELead + ERec +((PT_miss.Mag2())/(2.0*35.37)) + 0.0304;;
+    calculated_nu_E = (EMuon+MASS_MUON) + ELead + ERec +((PT_miss.Mag2())/(2.0*35.37)) + 0.0304;
   }
   if(_debug) std::cout<<"[VARIABLES] Value of Calculated_Nu_E: "<<calculated_nu_E<<std::endl;
   return calculated_nu_E;

@@ -4,7 +4,10 @@
 //Selects CC1mu2p events from specific GENIE ROOT file. Specifically from the gst tree.
 //User can specify particle thresholds and boolean for FSI in the tools/constants.h. Plots can then be made using analysis.C
 //
-// [HOW TO RUN THE CODE]                                                                                                                                                                                                      // root -b GENIE_selection.C                                                                                                                                                                                                  // GENIE_selection s                                                                                                                                                                                                          // s.Loop()  
+// [HOW TO RUN THE CODE]                                                                                                                                                                                                      
+// root -b GENIE_selection.C                                                                                                                                                                                                  
+// GENIE_selection s                               
+// s.Loop()  
 //
 //User will be prompted to provide interger which indicates which GENIE file to process
 //0 = Empirical (G18_02a_00_000)
@@ -17,6 +20,7 @@
 //(2) breakdown of selected events in terms of interaction mode
 ///////////////////////
 #define GENIE_selection_cxx
+#include "GENIE_selection.h"
 
 void GENIE_selection::Loop(){
 

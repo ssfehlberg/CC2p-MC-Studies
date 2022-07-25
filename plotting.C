@@ -2,7 +2,7 @@
 //7/19/2022: plotting.C
 //Author: Samantha Sword-Fehlberg
 //This makes plots that compare the selected events from 3 (4) GENIE MC models as a function of a number of variables.
-//We previously were making area normalized to compare the shapes, but this updated code now makes cross section plots as well.
+//We previousl were making area normalized to compare the shapes, but this updated code now makes cross section plots as well.
 //
 //[HOW TO RUN THE CODE]
 //root -b plotting.C
@@ -47,7 +47,7 @@ void plotting::main(){
   }
 
   //These were things from Raquel's original analysis.
-  //Don't use these now.
+  //Don't use these now: 7/25/2022
   /*TH1D* h_Enu = (TH1D*)f1->Get("h_Enu");
   TH1D* h_pmissT = (TH1D*)f1->Get("h_pmissT");
   TH1D* h_pMiss = (TH1D*)f1->Get("h_pMiss");
@@ -61,16 +61,55 @@ void plotting::main(){
   //Plotting Time!
   ////////////////
   for(int i = 0; i < num_cuts; i++){
-    for(int j =0; j < num_variables; j++){
-      area_normalized_plot(h_physics[0][i][j],h_physics[1][i][j],h_physics[2][i][j],y_lim_physics[i][j],titles_physics[j],path.c_str(),Form("%s%s",cuts[i],physics_variables[j]));
-    }
 
+    //Physics variables
+    for(int j =0; j < num_variables; j++){
+      cross_section_plot(h_physics[0][i][j],h_physics[1][i][j],h_physics[2][i][j],y_lim_physics_xsec[i][j],titles_physics[j],path.c_str(),Form("%s%s",cuts[i],physics_variables[j]));
+      area_normalized_plot(h_physics[0][i][j],h_physics[1][i][j],h_physics[2][i][j],y_lim_physics[i][j],titles_physics[j],path.c_str(),Form("%s%s",cuts[i],physics_variables[j]));
+    } //end loop over num_variables
+
+    //particles
     for(int j = 0; j < num_var; j++){
+
+      //Muon
+      cross_section_plot(h_muon[0][i][j],h_muon[1][i][j],h_muon[2][i][j],muon_ylim_xsec[j],Form("Muon %s",titles_var[j]),path.c_str(),Form("%s_muon%s",cuts[i],var[j]));
       area_normalized_plot(h_muon[0][i][j],h_muon[1][i][j],h_muon[2][i][j],muon_ylim[j],Form("Muon %s",titles_var[j]),path.c_str(),Form("%s_muon%s",cuts[i],var[j])); //muon
-      area_normalized_plot(h_leading[0][i][j],h_leading[1][i][j],h_leading[2][i][j],leading_ylim[j],Form("Leading Proton %s",titles_var[j]),path.c_str(),Form("%s_leading%s",cuts[i],var[j])); //leading
-      area_normalized_plot(h_recoil[0][i][j],h_recoil[1][i][j],h_recoil[2][i][j],recoil_ylim[j],Form("Recoil Proton %s",titles_var[j]),path.c_str(),Form("%s_recoil%s",cuts[i],var[j])); //recoil
-    }
+      
+      //Leading Proton
+      cross_section_plot(h_leading[0][i][j],h_leading[1][i][j],h_leading[2][i][j],leading_ylim_xsec[j],Form("Leading %s",titles_var[j]),path.c_str(),Form("%s_leading%s",cuts[i],var[j]));
+      area_normalized_plot(h_leading[0][i][j],h_leading[1][i][j],h_leading[2][i][j],leading_ylim[j],Form("Leading Proton %s",titles_var[j]),path.c_str(),Form("%s_leading%s",cuts[i],var[j])); //leadin
+
+      //Recoil Proton
+      cross_section_plot(h_recoil[0][i][j],h_recoil[1][i][j],h_recoil[2][i][j],recoil_ylim_xsec[j],Form("Recoil %s",titles_var[j]),path.c_str(),Form("%s_recoil%s",cuts[i],var[j]));
+      area_normalized_plot(h_recoil[0][i][j],h_recoil[1][i][j],h_recoil[2][i][j],recoil_ylim[j],Form("Recoil Proton %s",titles_var[j]),path.c_str(),Form("%s_recoil%s",cuts[i],var[j])); //recoil   
+
+    } //end loop over number of var
+  } //end loop over number of cuts
+
+  //Now to make the Truth versus Pred. Plot for the Neutrino Energy and Pn,proxy
+  /////////////////////////////////////////////////////////////////////////////
+
+  for(int j = 0; j < num_mc; j++){ 
+    h_true_nu_e[j] = (TH1D*)files[j]->Get(Form("h_nu_E_true%s",cuts[num_cuts-1]));
+    h_true_pn[j] = (TH1D*)files[j]->Get(Form("h_pn_true%s",cuts[num_cuts-1])); 
   }
+
+  truth_vs_pred_plot(h_physics[0][num_cuts-1][11],h_true_nu_e[0],
+		     h_physics[1][num_cuts-1][11],h_true_nu_e[1],
+		     h_physics[2][num_cuts-1][11],h_true_nu_e[2],
+		     "#nu_{E} = E_{#mu} + T_{Lead} + T_{Recoil} + T_{A-2} + (P^{T}_{miss})^{2}/(2*M_{A-2})",
+		     y_lim_physics[num_cuts-1][11],titles_physics[11],
+		     path.c_str(),Form("%s%s",cuts[num_cuts-1],physics_variables[11])); //energy of the neutrino
+
+  truth_vs_pred_plot(h_physics[0][num_cuts-1][7],h_true_pn[0],
+                     h_physics[1][num_cuts-1][7],h_true_pn[1],
+                     h_physics[2][num_cuts-1][7],h_true_pn[2],
+                     "#p_{n,proxy} = #sqrt{p_{T}^{2} + p_{L}^{2}}",y_lim_physics[num_cuts-1][7],titles_physics[7],
+                     path.c_str(),Form("%s%s",cuts[num_cuts-1],physics_variables[7])); //energy of the neutrino  
+
+  //truth_vs_pred_plot(); //pn,proxy
+
+
   std::cout<<"----PROGRAM HAS FINISHED-----"<<std::endl;
 }
 

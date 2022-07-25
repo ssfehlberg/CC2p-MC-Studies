@@ -1,22 +1,22 @@
+////////////////////
+//7/19/2022: GENIE_selection.C
+//Author: Samantha Sword-Fehlberg
+//Selects CC1mu2p events from specific GENIE ROOT file. Specifically from the gst tree.
+//User can specify particle thresholds and boolean for FSI in the tools/constants.h. Plots can then be made using analysis.C
+//
+// [HOW TO RUN THE CODE]                                                                                                                                                                                                      // root -b GENIE_selection.C                                                                                                                                                                                                  // GENIE_selection s                                                                                                                                                                                                          // s.Loop()  
+//
+//User will be prompted to provide interger which indicates which GENIE file to process
+//0 = Empirical (G18_02a_00_000)
+//1 = Nieves (G18_10a_02_11a)
+//2 = SuSAv2 (G21_11b_00_000)
+//3 = GCF + FSI (Created by Steven Gardiner). As of 7/15/2022 this sampl does not work.
+//
+//Two CSV files will be outtputted for each sample:
+//(1) number of events remaining after each cut
+//(2) breakdown of selected events in terms of interaction mode
+///////////////////////
 #define GENIE_selection_cxx
-
-//Helpful class includes:
-#include "GENIE_selection.h"
-#include "tools/histogram_funcs.h"
-#include "tools/constants.h"
-using namespace Constants;
-
-//ROOT Includes:
-#include <TH2.h>
-#include <TStyle.h>
-#include <TCanvas.h>
-
-//c++ includes
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <chrono>
-using namespace std::chrono;
 
 void GENIE_selection::Loop(){
 
@@ -26,18 +26,18 @@ void GENIE_selection::Loop(){
   ///////////////////////////////////////
   TFile* outputfile;
   if(fsi == true){
-    outputfile = new TFile(Form("/uboone/data/users/sfehlber/MC_Studies/GENIE/histograms/fsi/hists_%s_fsi.root",sample), "RECREATE");
+    outputfile = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/fsi/hists_%s_fsi.root",sample), "RECREATE");
   }else{
-    outputfile = new TFile(Form("/uboone/data/users/sfehlber/MC_Studies/GENIE/histograms/no_fsi/hists_%s_no_fsi.root",sample), "RECREATE");
+    outputfile = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/no_fsi/hists_%s_no_fsi.root",sample), "RECREATE");
   }
   std::ofstream result_table; //csv file containing the number of events after each cut
   std::ofstream interaction_table; //csv file containing the breakdown of events in terms of interaction modes
-  result_table.open(Form("/uboone/data/users/sfehlber/MC_Studies/GENIE/tables/%s_remaining_events.csv",sample));
-  interaction_table.open(Form("/uboone/data/users/sfehlber/MC_Studies/GENIE/tables/%s_interaction_modes.csv",sample));
+  result_table.open(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/tables/%s_remaining_events.csv",sample));
+  interaction_table.open(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/tables/%s_interaction_modes.csv",sample));
 
   //Define all the Histograms
   ///////////////////////////
-  histogram_funcs hist; //histograms_funcs.h
+  histogram_funcs hist; //histogram_funcs class inside of histograms_funcs.h
   hist.Define_Histograms(); //define all the histograms you want
 
   //random constants and things we will need later
@@ -54,8 +54,7 @@ void GENIE_selection::Loop(){
   double conversion = 1e-33;
   srand( unsigned(time(NULL)));
 
-  //counters
-  //number of selected event/channel                                                                             
+  //counters: number of selected event/channel                                                                             
   int cc0 = 0;
   int nc0 = 0;
   int qel0 = 0;
@@ -243,7 +242,7 @@ void GENIE_selection::Loop(){
      hist.Fill_Histograms(2,vBeam, vMuon, vLead, vRec, nu_true, pn_vec,weight);
      n_events[2]++;
       
-     //Cut on the Leading Proton Momentum                                                                                                                                                                                                           
+     //Cut on the Leading Proton Momentum                                                                           
      if(vLead.Mag() < PROTON_MOM_CUT_LOW || vLead.Mag() > PROTON_MOM_CUT_HIGH) continue;
      hist.Fill_Histograms(3,vBeam, vMuon, vLead, vRec, nu_true, pn_vec,weight);
      n_events[3]++;

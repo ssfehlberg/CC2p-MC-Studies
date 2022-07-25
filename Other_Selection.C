@@ -1,24 +1,13 @@
-#define selection_cxx
+////////////////////
+//7/19/2022: Other_Selection.C
+//Author: Samantha Sword-Fehlberg
+//This was an effort to analyze CC1mu2p events from GiBBU and NEUT. 
+//I never finished developing this cod as we didn't want to include it in the XSec measurement
+//Others should feel free to work on this code.
+///////////////////////
+#define Other_Selection_cxx
 
-//Helpful class includes:
-#include "selection.h"
-#include "../histogram_funcs.h"
-#include "../constants.h"
-using namespace Constants;
-
-//ROOT Includes:
-#include <TH2.h>
-#include <TStyle.h>
-#include <TCanvas.h>
-
-//c++ includes
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <chrono>
-using namespace std::chrono;
-
-void selection::Loop(){
+void Other_Selection::Loop(){
 
   auto start = high_resolution_clock::now();  
   

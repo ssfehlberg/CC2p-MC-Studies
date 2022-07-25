@@ -1,26 +1,36 @@
-//////////////////////////////////////////////////////////
-// This class has been automatically generated on
-// Tue Feb  9 10:05:49 2021 by ROOT version 6.12/06
-// from TTree gst/GENIE Summary Event Tree
-// found on file: root_files/samples/40Ar_uBFluxGeV_CCinclMEC_G18_02a_00_000_Q2_0_0.root
-//////////////////////////////////////////////////////////
-
+//////////////////
+//7/19/2022: GENIE_selection.h
+//Author: Samantha Sword-Fehlberg
+//Header file for the GENIE_Selection.C
+///////////////////////////////////////
 #ifndef GENIE_selection_h
 #define GENIE_selection_h
 
-#include <TROOT.h>
-#include <TChain.h>
-#include <TFile.h>
+//Helpful class includes:
+#include "GENIE_selection.h"
+#include "tools/histogram_funcs.h"
+#include "tools/constants.h"
+using namespace Constants;
+
+//ROOT Includes:
+#include <TH2.h>
+#include <TStyle.h>
+#include <TCanvas.h>
+
+//c++ includes
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <chrono>
+using namespace std::chrono;
 
 // Header file for the classes stored in the TTree if any.
-
 class GENIE_selection {
-public :
-   TTree          *fChain;   //!pointer to the analyzed TTree or TChain
-   Int_t           fCurrent; //!current Tree number in a TChain
+ public :
+  TTree          *fChain;   //!pointer to the analyzed TTree or TChain
+  Int_t           fCurrent; //!current Tree number in a TChain
 
-// Fixed size dimensions of array or collections stored in the TTree if any.
-
+   // Fixed size dimensions of array or collections stored in the TTree if any.
    // Declaration of leaf types
    Int_t           iev;
    Int_t           neu;
@@ -244,16 +254,16 @@ GENIE_selection::GENIE_selection(TTree *tree) : fChain(0)
   std::cin>>response;
   
   if(response =='0'){
-    file = "/uboone/data/users/sfehlber/MC_Studies/GENIE/samples/MEC/40Ar_uBFluxGeV_CCinclMEC_G18_02a_00_000_Q2_0_0.root";
+    file = "/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/samples/MEC/40Ar_uBFluxGeV_CCinclMEC_G18_02a_00_000_Q2_0_0.root";
     sample = "empirical_lwellyn";
   } else if(response == '1'){
-    file = "/uboone/data/users/sfehlber/MC_Studies/GENIE/samples/MEC/40Ar_uBFluxGeV_CCinclMEC_G18_10a_02_11a_Q2_0_0.root";
+    file = "/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/samples/MEC/40Ar_uBFluxGeV_CCinclMEC_G18_10a_02_11a_Q2_0_0.root";
     sample = "nieves";
   } else if(response == '2'){
-    file = "/uboone/data/users/sfehlber/MC_Studies/GENIE/samples/MEC/40Ar_uBFluxGeV_CCinclMEC_GTEST19_10b_00_000_Q2_0_0.root";
+    file = "/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/samples/MEC/40Ar_uBFluxGeV_CCinclMEC_GTEST19_10b_00_000_Q2_0_0.root";
     sample = "susav2";
   } else if(response == '3'){
-    file = "/uboone/data/users/sfehlber/MC_Studies/GENIE/samples/GCF/gcf.gst.root";
+    file = "/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/samples/GCF/gcf.gst.root";
     sample = "GCF_CCQE";
   } else{
     std::cout<<"Invalid Response. Please type 0, 1, or 2 for Empirical, Nieves, and Susav2 samples respectively."<<std::endl;

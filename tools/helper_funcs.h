@@ -1,69 +1,107 @@
-#include "constants.h"
-using namespace Constants;
-class helper_funcs{
- 
- public:
-  virtual void Overlay_In_FV(float x_low_edge, float x_up_edge, float y_low_edge, float y_up_edge, float z_low_edge, float z_up_edge, float x, float y, float z);
-  virtual bool In_FV(float x_low_edge, float x_up_edge, float y_low_edge, float y_up_edge, float z_low_edge, float z_up_edge, float x, float y, float z);
-  virtual double real_sqrt(double x);
-  virtual double Which_Energy(bool total_E, TVector3 mom, double mass);
+#include <sys/types.h>
+#include <sys/stat.h>
 
-  bool fv; //is the overlay event in the FV?
+const char* which_sample(){
 
-};//end of class definition
+  //Get the correct Sample
+  char response;
+  const char* Sample;
+  std::cout<<"Which Sample is This?"<<std::endl;
+  std::cout<<" 0 = pelee \n 1 = filtered \n 2 = unfiltered"<<std::endl;
+  std::cin>>response;
 
-
-//Used in the Overlay to help with the MC breakdown definitions. Does same thing as above but returns fv variable
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void helper_funcs::Overlay_In_FV(float x_low_edge, float x_up_edge, float y_low_edge, float y_up_edge, float z_low_edge, float z_up_edge, float x, float y, float z){
-  float_t xmin = 0.0 + x_low_edge;
-  float_t xmax = 256.35 - x_up_edge;
-  float_t ymin = -116.5 + y_low_edge;
-  float_t ymax = 116.5 - y_up_edge;
-  float_t zmin = 0.0 + z_low_edge;
-  float_t zmax = 1036.8 - z_up_edge;
-
-  if((x <= xmin || x >= xmax) || (y <= ymin || y >= ymax) || (z <= zmin || z >= zmax)){
-    fv = false;
-  } else{
-    fv = true;
-  } 
-}
-
-//Determines if the input x,y,z is wihtin the FV. The distance from any edge can be defined by VAR_low(high)_edge
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool helper_funcs::In_FV(float x_low_edge, float x_up_edge, float y_low_edge, float y_up_edge, float z_low_edge, float z_up_edge, float x, float y, float z){
-  float_t xmin = 0.0 + x_low_edge;
-  float_t xmax = 256.35 - x_up_edge;
-  float_t ymin = -116.5 + y_low_edge;
-  float_t ymax = 116.5 - y_up_edge;
-  float_t zmin = 0.0 + z_low_edge;
-  float_t zmax = 1036.8 - z_up_edge;
-
-  if((x <= xmin || x >= xmax) || (y <= ymin || y >= ymax) || (z <= zmin || z >= zmax)){
-    return false;
-  } else{
-    return true;
-  } 
-}
-
-
-
-//Defines Real Square Root in Case number is negative
-//////////////////////////////////////////////////////
-double helper_funcs::real_sqrt( double x ) {
-  if ( x < 0. ) return 0.;
-  else return std::sqrt( x );
-}
-
-//Calculates either the kinetic or total energy of a particle. Total_e = true -> total energy, Total_E = false-> KE. Needs momentum and mass of particle                                                                                          /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-double helper_funcs::Which_Energy(bool total_E, TVector3 mom, double mass){
-  double Energy;
-  if(total_E == true){ //Total Energy
-    Energy = std::sqrt(mom.Mag2() + std::pow(mass,2));
-  } else if (total_E == false){
-    Energy = std::sqrt(mom.Mag2() + std::pow(mass,2)) - mass; //Kinetic Energy
+  if(response == '0'){
+    Sample = "pelee";
+  }else if (response == '1'){
+    Sample = "unfiltered";
+  }else if(response == '2'){
+    Sample = "unfiltered";
+  }else{
+      std::cout<<"Invalid Response. Please Type 0, 1, or 2 for pelee, filtered, and unfiltered samples respectively."<<std::endl;
   }
-  return Energy;
+
+  return Sample;
+
 }
 
+std::pair<const char*, const char*> which_run(){
+  
+  //Get the Correct Run
+  char response1;
+  const char* Run;
+  const char* Run_Title;
+  std::cout<<"Which Run is This?"<<std::endl;
+  std::cout<<" 0 = Jan \n 1 = Run 1 \n 2 = Run 2 \n 3 = Run 3 \n 4 = Runs 1+2+3"<<std::endl;
+  std::cin>>response1;
+
+  if(response1 == '0'){
+    Run = "Jan";
+    Run_Title = "January Sample";
+  } else if(response1 == '1'){
+    Run = "Run1";
+    Run_Title = "Run 1";
+  } else if(response1 == '2') {
+    Run = "Run2";
+    Run_Title = "Run 2";
+  } else if (response1 == '3'){
+    Run = "Run3";
+    Run_Title = "Run 3";
+  }else if(response1 == '4'){
+    Run = "Run_all";
+    Run_Title = "Runs 1+2+3";
+  }else{
+      std::cout<<"Invalid Response. Please Type 0, 1, 2 , or 3 for January, Run 1, Run2 ,and Run 3 for pelee, filtered, and respectively."<<std::endl;
+  }
+
+  return std::make_pair(Run,Run_Title);
+
+}
+
+/******************************************************************************  
+                                             * Checks to see if a directory exists. Note: This method only checks the                                                     * existence of the full path AND if path leaf is a dir.                                                                      *                                                                                                                            * @return  >0 if dir exists AND is a dir,                                                                                    *           0 if dir does not exist OR exists but not a dir,                                                                 *          <0 if an error occurred (errno is also set)                                                                       *****************************************************************************/
+
+int dirExists(const char* const path)
+{
+    struct stat info;
+
+    int statRC = stat( path, &info );
+    if( statRC != 0 )
+    {
+        if (errno == ENOENT)  { return 0; } // something along the path does not exist                                                                                                                                                     
+        if (errno == ENOTDIR) { return 0; } // something in path prefix is not a dir                                                                                                                                                       
+        return -1;
+    }
+
+    return ( info.st_mode & S_IFDIR ) ? 1 : 0;
+}
+
+double calculatePearsonChiSq(TH1D* O, TH1D* E){
+    double chisq = 0;
+    for (int i = 1; i < O->GetNbinsX()+1; i++){
+        double O_i = O->GetBinContent(i);
+        double E_i = E->GetBinContent(i);
+        if (O_i == 0 && E_i == 0){
+	  chisq += 0;
+
+	} else if (E_i == 0){
+	  chisq += 0;
+
+	}else{
+	  //chisq += std::pow(O_i - E_i,2)/((O_i+E_i)/2);
+	  chisq += std::pow(O_i - E_i,2)/(E_i);
+
+        } //end of else
+    } //end of for loop
+
+    return chisq;
+}
+
+void OverlayStatistics(TH1D* O, TH1D* E, TH1D* L){
+  for(int i_bin = 1; i_bin < O->GetXaxis()->GetNbins(); i_bin++){
+    double total_mc_in_bin = O->GetBinContent(i_bin);
+    double total_ext_in_bin = E->GetBinContent(i_bin);
+    double total_dirt_in_bin = L->GetBinContent(i_bin);
+    O->SetBinContent(i_bin,(total_mc_in_bin+total_ext_in_bin+total_dirt_in_bin));
+    O->SetBinError(i_bin, std::sqrt(total_mc_in_bin + total_ext_in_bin + total_dirt_in_bin));
+  }
+}

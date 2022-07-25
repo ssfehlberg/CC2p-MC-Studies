@@ -1,27 +1,37 @@
-//////////////////////////////////////////////////////////
-// This class has been automatically generated on
-// Mon Mar  7 16:17:41 2022 by ROOT version 6.12/06
-// from TTree FlatTree_VARS/FlatTree_VARS
-// found on file: /uboone/data/users/sfehlber/Other_Model_Stuff/NEUT.root
-//////////////////////////////////////////////////////////
+//////////////////
+//7/19/2022: GENIE_selection.h
+//Author: Samantha Sword-Fehlberg
+//Header file for the Other_Selection.C
+///////////////////////////////////////
+#ifndef Other_Selection_h
+#define Other_Selection_h
 
-#ifndef neut_h
-#define neut_h
+//Helpful class includes:
+#include "GENIE_selection.h"
+#include "tools/histogram_funcs.h"
+#include "tools/constants.h"
+using namespace Constants;
 
-#include <TROOT.h>
-#include <TChain.h>
-#include <TFile.h>
+//ROOT Includes:
+#include <TH2.h>
+#include <TStyle.h>
+#include <TCanvas.h>
+
+//c++ includes
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <chrono>
+using namespace std::chrono;
 
 // Header file for the classes stored in the TTree if any.
+class Other_Selection {
+ public :
+  TTree          *fChain;   //!pointer to the analyzed TTree or TChain
+  Int_t           fCurrent; //!current Tree number in a TChain
 
-class neut {
-public :
-   TTree          *fChain;   //!pointer to the analyzed TTree or TChain
-   Int_t           fCurrent; //!current Tree number in a TChain
-
-// Fixed size dimensions of array or collections stored in the TTree if any.
-
-   // Declaration of leaf types
+  // Fixed size dimensions of array or collections stored in the TTree if any.
+  // Declaration of leaf types
    Int_t           Mode;
    Char_t          cc;
    Int_t           PDGnu;
@@ -163,8 +173,8 @@ public :
    TBranch        *b_flagNC1pi0;   //!
    TBranch        *b_flagCC0piMINERvA;   //!
 
-   neut(TTree *tree=0);
-   virtual ~neut();
+   Other_Selection(TTree *tree=0);
+   virtual ~Other_Selection();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
@@ -185,8 +195,8 @@ public :
 
 #endif
 
-#ifdef neut_cxx
-neut::neut(TTree *tree) : fChain(0) 
+#ifdef Other_Selection_cxx
+Other_Selection::Other_Selection(TTree *tree) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
@@ -201,7 +211,7 @@ neut::neut(TTree *tree) : fChain(0)
     file = "/uboone/data/users/sfehlber/Other_Model_Stuff/NEUT.root";
     sample = "neut";
   } else{
-    std::cout<<"Invalid Response. Please type 0 or 1 for GixBBU or NEUT sample, respectively."<<std::endl;
+    std::cout<<"Invalid Response. Please type 0 or 1 for GiBBU or NEUT sample, respectively."<<std::endl;
   }
 
    if (tree == 0) {
@@ -215,19 +225,19 @@ neut::neut(TTree *tree) : fChain(0)
    Init(tree);
 }
 
-neut::~neut()
+Other_Selection::~Other_Selection()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t neut::GetEntry(Long64_t entry)
+Int_t Other_Selection::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
-Long64_t neut::LoadTree(Long64_t entry)
+Long64_t Other_Selection::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -240,7 +250,7 @@ Long64_t neut::LoadTree(Long64_t entry)
    return centry;
 }
 
-void neut::Init(TTree *tree)
+void Other_Selection::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -328,7 +338,7 @@ void neut::Init(TTree *tree)
    Notify();
 }
 
-Bool_t neut::Notify()
+Bool_t Other_Selection::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -339,18 +349,18 @@ Bool_t neut::Notify()
    return kTRUE;
 }
 
-void neut::Show(Long64_t entry)
+void Other_Selection::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t neut::Cut(Long64_t entry)
+Int_t Other_Selection::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
    return 1;
 }
-#endif // #ifdef neut_cxx
+#endif // #ifdef Other_Selection_cxx

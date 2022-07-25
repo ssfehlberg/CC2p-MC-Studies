@@ -24,8 +24,8 @@ class histogram_funcs
   
   //Histograms 
   /////////////////
-  static const int num_cuts = 7;
-  const char* cuts[num_cuts] = {"_b4_cuts","_pmiss_cut","_muon_cut","_lead_cut","_rec_cut","_pionpm_cut","_pion0_cut"};
+  static const int num_cuts = 5;//7
+  const char* cuts[num_cuts] = {"_b4_cuts","_pmiss_cut","_muon_cut","_lead_cut","_rec_cut"};//,"_pionpm_cut","_pion0_cut"};
   static const int num_var = 4;
   const char* var[num_var] = {"_mom","_E","_theta","_phi"};
   int num_bins[num_var] = {40,50,30,10}; //50 first bin, 10 last bin                                                                                                                                                                                         

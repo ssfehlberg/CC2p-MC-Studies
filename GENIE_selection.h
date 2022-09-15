@@ -249,7 +249,7 @@ GENIE_selection::GENIE_selection(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
   std::cout<<"Which MC Are we Looking at?"<<std::endl;
-  std::cout<<" 0 = Empirical \n 1 = Nieves \n 2 = Susav2 \n 3 = GCF"<<std::endl;
+  std::cout<<" 0 = Empirical \n 1 = Nieves \n 2 = Susav2 \n 3 = GCF \n 4 = Nusiance"<<std::endl;
   std::cin>>response;
   
   if(response =='0'){
@@ -264,8 +264,11 @@ GENIE_selection::GENIE_selection(TTree *tree) : fChain(0)
   } else if(response == '3'){
     file = "/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/samples/GCF/gcf.gst.root";
     sample = "GCF_CCQE";
+  } else if(response == '4'){
+    file = "/pnfs/uboone/persistent/users/apapadop/GENIETweakedSamples/gntp.0.ghep_G21_11d_00_000.gst.root";
+    sample = "Nusiance";
   } else{
-    std::cout<<"Invalid Response. Please type 0, 1, or 2 for Empirical, Nieves, and Susav2 samples respectively."<<std::endl;
+    std::cout<<"Invalid Response. Please type 0, 1, 2, 3, or 4 for Empirical, Nieves, and Susav2 samples respectively."<<std::endl;
   }
 
    if (tree == 0) {

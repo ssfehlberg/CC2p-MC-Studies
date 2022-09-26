@@ -30,10 +30,12 @@ void plotting::main(){
   TFile* f2 = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/%s/hists_nieves_%s_%s.root",FSI,FSI,XSEC_BINNING));
   TFile* f3 = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/%s/hists_susav2_%s_%s.root",FSI,FSI,XSEC_BINNING));
   //TFile* f4=new TFile("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/%s/hists_GCF_CCQE_%s%s.root",FSI,FSI,XSEC_BINNING)); //don't know how to compare to this yet. 
+  TFile* f5 = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/%s/hists_Nusiance_%s_%s.root",FSI,FSI,XSEC_BINNING));
   files.push_back(f1);
   files.push_back(f2);
   files.push_back(f3);
   //files.push_back(f4);
+  files.push_back(f5);
     
   const char* pathname = Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/images/%s/%s",FSI,XSEC_BINNING);
   string path(pathname);

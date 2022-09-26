@@ -14,10 +14,12 @@
 //1 = Nieves (G18_10a_02_11a)
 //2 = SuSAv2 (G21_11b_00_000)
 //3 = GCF + FSI (Created by Steven Gardiner). As of 7/15/2022 this sampl does not work.
+//4 = Nuisance (not really nuisance but actually the GENIE v3.2.0 tag of the SuSA model)
 //
-//Two CSV files will be outtputted for each sample:
+//Three CSV files will be outtputted for each sample:
 //(1) number of events remaining after each cut
 //(2) breakdown of selected events in terms of interaction mode
+//(3) RSE in form as requested by Steven and Afro
 ///////////////////////
 #define GENIE_selection_cxx
 #include "GENIE_selection.h"
@@ -36,10 +38,14 @@ void GENIE_selection::Loop(){
   TFile* outputfile = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/%s/hists_%s_%s_%s.root",FSI,sample,FSI,XSEC_BINNING), "RECREATE");
 
   std::ofstream result_table; //csv file containing the number of events after each cut
-  std::ofstream interaction_table; //csv file containing the breakdown of events in terms of interaction modes
   result_table.open(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/tables/%s_remaining_events_%s_%s.csv",sample,FSI,XSEC_BINNING));
+
+  std::ofstream interaction_table; //csv file containing the breakdown of events in terms of interaction modes
   interaction_table.open(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/tables/%s_interaction_modes_%s_%s.csv",sample,FSI,XSEC_BINNING));
 
+  std::ofstream rse; //csv containg the signal events as requested by Afro and Steven
+  rse.open(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/tables/%s_rse_%s_%s.csv",sample,FSI,XSEC_BINNING));
+  rse <<"Event #"<<" "<<"Muon Momemntum"<<" "<<"Lead Proton Momentum"<<" "<<"Recoil Proton Momentum"<<std::endl;
   //Define all the Histograms
   ///////////////////////////
   histogram_funcs hist; //histogram_funcs class inside of histograms_funcs.h
@@ -307,6 +313,9 @@ void GENIE_selection::Loop(){
      }
 
 
+     //Be sure to put your stuff into the rse CSV file
+     rse << iev << " "<< vMuon.Mag() <<" "<< vLead.Mag() <<" "<< vRec.Mag() <<" \n";
+
      ////////////
      //DEPRICATED
      /////////////
@@ -345,6 +354,8 @@ void GENIE_selection::Loop(){
    interaction_table <<"Number of COH Events "<< coh0 <<" \n";
    interaction_table <<"Number of DIS Events "<< dis0 <<" \n";
    interaction_table.close();
+
+   rse.close();
 
    std::cout<<"---------[RESULTS OF CUTS]---------"<<std::endl;
    std::cout<<"Total Number of Events: "<<nentries<<std::endl;

@@ -5,6 +5,10 @@ namespace Constants{
   //debug statements
   bool _debug = false; 
 
+  //input and output directory
+  const char* input = "/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/samples";
+  const char* output = "/uboone/data/users/sfehlber/CC2p/MC_Studies";
+    
   //Are we adding protons together in the STVs?
   bool add_protons = true;
 

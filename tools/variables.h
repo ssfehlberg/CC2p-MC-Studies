@@ -1,9 +1,10 @@
-#include "helper_funcs.h"
+#include "constants.h"
 using namespace Constants;
 
 class variables{
 
  public:
+  virtual double Which_Energy(bool total_E, TVector3 mom, double mass);
   virtual vector<double> Calculate_Momenta(TVector3 vmuon, TVector3 vlead, TVector3 vrec);
   virtual vector<double> Calculate_Energy(TVector3 vmuon, TVector3 vlead, TVector3 vrec);
   virtual vector<double> Calculate_Detector_Angles(TVector3 vmuon, TVector3 vlead, TVector3 vrec);
@@ -12,8 +13,6 @@ class variables{
   virtual vector<double> Calculate_STVS(bool add_protons, TVector3 vMuon, TVector3 vLead, TVector3 vRec);
   virtual double Calculate_Beam(TVector3 vMuon, TVector3 vLead, TVector3 vRec,double EMuon, double ELead, double ERec); //energies are kinetic 
   virtual void Calculate_Variables(TVector3 vmuon, TVector3 vlead, TVector3 vrec, bool add_protons);
-
-  helper_funcs help; //class of helper functions
 
   vector<double> momenta;
   vector<double> Energies;
@@ -24,6 +23,17 @@ class variables{
   double calculated_nu_E;
 
 }; //End of class definition
+
+//Calculates either the kinetic or total energy of a particle. Total_e = true -> total energy, Total_E = false-> KE. Needs momentum and mass of particle                                                                                          /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+double variables::Which_Energy(bool total_E, TVector3 mom, double mass){
+  double Energy;
+  if(total_E == true){ //Total Energy
+    Energy = std::sqrt(mom.Mag2() + std::pow(mass,2));
+  } else if (total_E == false){
+    Energy = std::sqrt(mom.Mag2() + std::pow(mass,2)) - mass; //Kinetic Energy
+  }
+  return Energy;
+}
 
 //Calculates the Momenta of the three particles given the TVector3. Returns vector with magnitude of muon, lead, and reco momentum
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,8 +86,8 @@ vector<double> variables::Calculate_Energy(TVector3 vmuon, TVector3 vlead, TVect
     KE_Muon = -9999.0;
     TotE_Muon = -9999.0;
   } else {
-    KE_Muon = help.Which_Energy(false,vmuon,MASS_MUON);
-    TotE_Muon = help.Which_Energy(true,vmuon,MASS_MUON);
+    KE_Muon = Which_Energy(false,vmuon,MASS_MUON);
+    TotE_Muon = Which_Energy(true,vmuon,MASS_MUON);
   }
 
   //lead proton    
@@ -87,8 +97,8 @@ vector<double> variables::Calculate_Energy(TVector3 vmuon, TVector3 vlead, TVect
     KE_Lead = -9999.0;
     TotE_Lead = -9999.0;
   } else {
-    KE_Lead = help.Which_Energy(false,vlead,MASS_PROTON);
-    TotE_Lead = help.Which_Energy(true,vlead,MASS_PROTON);
+    KE_Lead = Which_Energy(false,vlead,MASS_PROTON);
+    TotE_Lead = Which_Energy(true,vlead,MASS_PROTON);
   }
 
   //recoil proton  
@@ -98,8 +108,8 @@ vector<double> variables::Calculate_Energy(TVector3 vmuon, TVector3 vlead, TVect
     KE_Rec = -9999.0;
     TotE_Rec = -9999.0;
   } else {
-    KE_Rec = help.Which_Energy(false,vrec,MASS_PROTON);
-    TotE_Rec = help.Which_Energy(true,vrec,MASS_PROTON);
+    KE_Rec = Which_Energy(false,vrec,MASS_PROTON);
+    TotE_Rec = Which_Energy(true,vrec,MASS_PROTON);
   }
 
   //vector<double> Energies{KE_Muon, TotE_Muon, KE_Lead, TotE_Lead, KE_Rec, TotE_Rec};

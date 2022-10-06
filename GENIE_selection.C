@@ -12,9 +12,9 @@
 //User will be prompted to provide interger which indicates which GENIE file to process
 //0 = Empirical (G18_02a_00_000)
 //1 = Nieves (G18_10a_02_11a)
-//2 = SuSAv2 (G21_11b_00_000)
+//2 = SuSAv2 (G19TEST)
 //3 = GCF + FSI (Created by Steven Gardiner). As of 7/15/2022 this sampl does not work.
-//4 = Nuisance (not really nuisance but actually the GENIE v3.2.0 tag of the SuSA model)
+//4 = SuSAv2 (GENIE v3.2.0 tag of the SuSA model: Used in the publication)
 //
 //Three CSV files will be outtputted for each sample:
 //(1) number of events remaining after each cut
@@ -35,16 +35,16 @@ void GENIE_selection::Loop(){
   if(fsi == true){ FSI = "fsi";} else { FSI = "no_fsi";};
   if(use_xsec_binning == true){ XSEC_BINNING = "xsec";} else { XSEC_BINNING = "no_xsec";};
 
-  TFile* outputfile = new TFile(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/histograms/%s/hists_%s_%s_%s.root",FSI,sample,FSI,XSEC_BINNING), "RECREATE");
+  TFile* outputfile = new TFile(Form("%s/GENIE/histograms/%s/hists_%s_%s_%s.root",output,FSI,sample,FSI,XSEC_BINNING), "RECREATE");
 
   std::ofstream result_table; //csv file containing the number of events after each cut
-  result_table.open(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/tables/%s_remaining_events_%s_%s.csv",sample,FSI,XSEC_BINNING));
+  result_table.open(Form("%s/GENIE/tables/%s_remaining_events_%s_%s.csv",output,sample,FSI,XSEC_BINNING));
 
   std::ofstream interaction_table; //csv file containing the breakdown of events in terms of interaction modes
-  interaction_table.open(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/tables/%s_interaction_modes_%s_%s.csv",sample,FSI,XSEC_BINNING));
+  interaction_table.open(Form("%s/GENIE/tables/%s_interaction_modes_%s_%s.csv",output,sample,FSI,XSEC_BINNING));
 
   std::ofstream rse; //csv containg the signal events as requested by Afro and Steven
-  rse.open(Form("/uboone/data/users/sfehlber/CC2p/MC_Studies/GENIE/tables/%s_rse_%s_%s.csv",sample,FSI,XSEC_BINNING));
+  rse.open(Form("%s/GENIE/tables/%s_rse_%s_%s.csv",output,sample,FSI,XSEC_BINNING));
   rse <<"Event #"<<" "<<"Muon Momemntum"<<" "<<"Lead Proton Momentum"<<" "<<"Recoil Proton Momentum"<<std::endl;
   //Define all the Histograms
   ///////////////////////////
@@ -312,20 +312,8 @@ void GENIE_selection::Loop(){
        coh0++;
      }
 
-
      //Be sure to put your stuff into the rse CSV file
      rse << iev << " "<< vMuon.Mag() <<" "<< vLead.Mag() <<" "<< vRec.Mag() <<" \n";
-
-     ////////////
-     //DEPRICATED
-     /////////////
-
-     //Do all the stuf for Raquel's Analysis
-     //hist.compute_raquel(vBeam, vMuon, vLead, vRec, pn_vec,weight);
-     //Remove events with P_missT greater than 300 MeV
-     //if(p_missT >= 0.3) continue; //this is broken!!!!!!! I NEED TO FIX THIS!
-     //n_pmissT++;
-     //h_cos_gamma_cm_with_cut->Fill(cos_gamma_cm,weight); //Figure 4 in Raquel's Note
 
      //Make sure to clear vectors when you are done
      protons_id.clear();
@@ -381,8 +369,7 @@ void GENIE_selection::Loop(){
    std::cout << "Number of DIS Events: "<<dis0<<" Fraction of the Total: "<<float(100.*(float(dis0)/float(n_events[4])))<<"%"<<std::endl;
    std::cout<<"------------------"<<std::endl;
 
-   //Write the histograms and 
-   //close the output root file
+   //Write the histograms and and close the output root files
    outputfile->cd();
    hist.Write_Histograms();
    outputfile->Close();
